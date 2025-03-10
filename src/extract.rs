@@ -3,7 +3,7 @@ pub mod identifier;
 pub mod location;
 pub mod tiploc;
 
-use serde::{self, Deserialize, Serialize};
+use serde::{self, de, Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum TransactionType {
@@ -15,6 +15,7 @@ pub enum TransactionType {
     Delete,
 }
 
+#[derive(Debug)]
 /// Type representing the possible record types within a CIF extract
 pub enum Record {
     /// Header
@@ -47,6 +48,29 @@ pub enum Record {
     ZZ,
 }
 
-pub struct Extract {
-    header: header::Header,
+pub struct RecordVisitor;
+
+impl<'de> de::Visitor<'de> for RecordVisitor {
+    type Value = Record;
+
+    fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
+        formatter.write_str("a record starting with a valid record identity'")
+    }
+
+    fn visit_str<E>(self, record_str: &str) -> std::result::Result<Self::Value, E>
+    where
+        E: de::Error,
+    {
+        println!("Record Str: {:#?}", record_str);
+        Ok(Record::ZZ)
+    }
+}
+
+impl<'de> de::Deserialize<'de> for Record {
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: de::Deserializer<'de>,
+    {
+        deserializer.deserialize_str(RecordVisitor)
+    }
 }
