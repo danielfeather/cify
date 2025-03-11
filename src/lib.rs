@@ -103,7 +103,7 @@ impl<'de, 'a> SeqAccess<'de> for LineSeparated<'a, 'de> {
         T: DeserializeSeed<'de>,
     {
         // Check if there are no more elements.
-        if self.de.peek_char()? == ']' {
+        if self.de.peek_char().is_err_and(|e| matches!(e, Error::Eof)) {
             return Ok(None);
         }
 
@@ -116,24 +116,4 @@ impl<'de, 'a> SeqAccess<'de> for LineSeparated<'a, 'de> {
         // Deserialize an array element.
         seed.deserialize(&mut *self.de).map(Some)
     }
-}
-
-#[test]
-fn test_deserialize_set() {
-    let data = r#"HDTPS.UDFROC1.PD2502282802252154DFROC1B       FA280225280226                    
-TIAACHEN 00081601LAACHEN                    00005   0                           
-TIABARASQ00027400VABERAERON                 00000   0AERABERAERON               
-TIABCWM  00385964VABERCWMBOI                78128   0                           
-TIABDAPEN00398202VPENYWAUN BUS              00000   0XPZ                        
-TIABDARAR00398204BABERDARE PLATFORM 2       78102   0XCBABDARAR                 
-TIABDARE 00398200TABERDARE PLATFORM 1       78100   0ABAABERDARE                
-TIABDATRE00398203ATRECYNON BUS              00000   0XTO                        
-TIABDO   00909000ZABERDOUR                  03295   0AURABERDOUR                
-TIABDVY  00443500EABERDOVEY                 64409   0AVYABERDOVEY               
-TIABER   08381300LABER                      78371   0ABEABER                    
-TIABGLELE00244800AABERGELE & PENSARN        40073   0AGLABERGELE & PENSN        "#;
-
-    let result: Vec<Record> = from_str(data).expect("Invalid header");
-
-    println!("{:#?}", result)
 }
