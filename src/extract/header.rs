@@ -1,5 +1,3 @@
-use std::os::macos::raw;
-
 use serde::{
     de::{self, value::StrDeserializer},
     Deserialize, Serialize,

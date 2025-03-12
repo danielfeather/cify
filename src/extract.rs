@@ -16,16 +16,17 @@ pub enum TransactionType {
 }
 
 #[derive(Debug)]
+#[serde()]
 /// Type representing the possible record types within a CIF extract
 pub enum Record {
     /// Header
-    HD(header::Header),
+    HD(String),
     /// TIPLOC Insert
-    TI(tiploc::TiplocInsert),
+    TI(String),
     /// TIPLOC Amend
-    TA(tiploc::TiplocAmend),
+    TA(String),
     /// TIPLOC Delete
-    TD(tiploc::TiplocDelete),
+    TD(String),
     /// Association
     AA,
     /// Basic Schedule

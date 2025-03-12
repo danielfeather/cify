@@ -2,7 +2,6 @@
 
 mod schedule;
 use error::{Error, Result};
-use extract::Record;
 use serde::de::{self, DeserializeSeed, SeqAccess};
 
 pub mod error;
@@ -84,12 +83,11 @@ pub fn from_str<'a, T: de::Deserialize<'a>>(input: &'a str) -> error::Result<T> 
 // element.
 struct LineSeparated<'a, 'de: 'a> {
     de: &'a mut Deserializer<'de>,
-    first: bool,
 }
 
 impl<'a, 'de> LineSeparated<'a, 'de> {
     fn new(de: &'a mut Deserializer<'de>) -> Self {
-        LineSeparated { de, first: true }
+        LineSeparated { de }
     }
 }
 
@@ -102,17 +100,17 @@ impl<'de, 'a> SeqAccess<'de> for LineSeparated<'a, 'de> {
     where
         T: DeserializeSeed<'de>,
     {
+        let peek_char = self.de.peek_char();
+
         // Check if there are no more elements.
-        if self.de.peek_char().is_err_and(|e| matches!(e, Error::Eof)) {
+        if peek_char.is_err_and(|e| matches!(e, Error::Eof)) {
             return Ok(None);
         }
 
         // Comma is required before every element except the first.
-        if !self.first && self.de.next_char()? != '\n' {
+        if self.de.next_char()? != '\n' {
             return Err(Error::Syntax);
         }
-
-        self.first = false;
         // Deserialize an array element.
         seed.deserialize(&mut *self.de).map(Some)
     }
