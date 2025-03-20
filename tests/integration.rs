@@ -8,7 +8,7 @@ use cify::extract::Record;
 fn deserialize_array() -> Result<(), Error> {
     let raw = fs::read_to_string("tests/extract.cif")?;
 
-    let result = cify::from_str::<Vec<Record>>(&raw).unwrap();
+    let result = cify::from_str::<Record>(&raw);
 
     println!("Result: {:?}", result);
 

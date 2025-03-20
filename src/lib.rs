@@ -22,6 +22,17 @@ impl<'de> Deserializer<'de> {
         self.input = &self.input[ch.len_utf8()..];
         Ok(ch)
     }
+
+    fn parse_string(&mut self) -> Result<&'de str> {
+        match self.input.find('\n') {
+            Some(len) => {
+                let s = &self.input[..len];
+                self.input = &self.input[len + 1..];
+                Ok(s)
+            }
+            None => Ok(&self.input[..self.input.len()]),
+        }
+    }
 }
 
 pub struct Deserializer<'de> {
@@ -32,22 +43,23 @@ impl<'de, 'a> de::Deserializer<'de> for &'a mut Deserializer<'de> {
     type Error = error::Error;
 
     serde::forward_to_deserialize_any! {
-        bool i8 i16 i32 i64 u8 u16 u32 u64 f32 f64 char string
+        bool i8 i16 i32 i64 u8 u16 u32 u64 f32 f64 char
         byte_buf option unit unit_struct newtype_struct tuple tuple_struct
-        map struct enum identifier ignored_any bytes
+        map struct ignored_any bytes
     }
 
     fn deserialize_str<V>(self, visitor: V) -> std::result::Result<V::Value, Self::Error>
     where
         V: de::Visitor<'de>,
     {
-        self.input = self
-            .input
-            .strip_suffix("\r\n")
-            .or(self.input.strip_suffix("\n"))
-            .unwrap_or(self.input);
+        visitor.visit_borrowed_str(self.parse_string()?)
+    }
 
-        visitor.visit_str::<Self::Error>(&self.input)
+    fn deserialize_string<V>(self, visitor: V) -> Result<V::Value>
+    where
+        V: de::Visitor<'de>,
+    {
+        self.deserialize_str(visitor)
     }
 
     fn deserialize_any<V>(self, visitor: V) -> std::result::Result<V::Value, Self::Error>
@@ -68,6 +80,28 @@ impl<'de, 'a> de::Deserializer<'de> for &'a mut Deserializer<'de> {
         V: de::Visitor<'de>,
     {
         visitor.visit_seq(LineSeparated::new(self))
+    }
+
+    fn deserialize_enum<V>(
+        self,
+        name: &'static str,
+        variants: &'static [&'static str],
+        visitor: V,
+    ) -> std::result::Result<V::Value, Self::Error>
+    where
+        V: de::Visitor<'de>,
+    {
+        visitor.visit_enum(Enum::new(self))
+    }
+
+    fn deserialize_identifier<V>(self, visitor: V) -> Result<V::Value>
+    where
+        V: de::Visitor<'de>,
+    {
+        let id = &self.input[..2];
+        self.input = &self.input[2..];
+
+        visitor.visit_str(id)
     }
 }
 
@@ -113,5 +147,73 @@ impl<'de, 'a> SeqAccess<'de> for LineSeparated<'a, 'de> {
         }
         // Deserialize an array element.
         seed.deserialize(&mut *self.de).map(Some)
+    }
+}
+
+struct Enum<'a, 'de: 'a> {
+    de: &'a mut Deserializer<'de>,
+}
+
+impl<'a, 'de> Enum<'a, 'de> {
+    fn new(de: &'a mut Deserializer<'de>) -> Self {
+        Enum { de }
+    }
+}
+
+// `EnumAccess` is provided to the `Visitor` to give it the ability to determine
+// which variant of the enum is supposed to be deserialized.
+//
+// Note that all enum deserialization methods in Serde refer exclusively to the
+// "externally tagged" enum representation.
+impl<'de, 'a> de::EnumAccess<'de> for Enum<'a, 'de> {
+    type Error = Error;
+    type Variant = Self;
+
+    fn variant_seed<V>(self, seed: V) -> Result<(V::Value, Self::Variant)>
+    where
+        V: DeserializeSeed<'de>,
+    {
+        let val = seed.deserialize(&mut *self.de)?;
+
+        Ok((val, self))
+    }
+}
+
+// `VariantAccess` is provided to the `Visitor` to give it the ability to see
+// the content of the single variant that it decided to deserialize.
+impl<'de, 'a> de::VariantAccess<'de> for Enum<'a, 'de> {
+    type Error = Error;
+
+    // If the `Visitor` expected this variant to be a unit variant, the input
+    // should have been the plain string case handled in `deserialize_enum`.
+    fn unit_variant(self) -> Result<()> {
+        Err(Error::InvalidLength)
+    }
+
+    // Newtype variants are represented in JSON as `{ NAME: VALUE }` so
+    // deserialize the value here.
+    fn newtype_variant_seed<T>(self, seed: T) -> Result<T::Value>
+    where
+        T: DeserializeSeed<'de>,
+    {
+        seed.deserialize(self.de)
+    }
+
+    // Tuple variants are represented in JSON as `{ NAME: [DATA...] }` so
+    // deserialize the sequence of data here.
+    fn tuple_variant<V>(self, _len: usize, visitor: V) -> Result<V::Value>
+    where
+        V: de::Visitor<'de>,
+    {
+        de::Deserializer::deserialize_seq(self.de, visitor)
+    }
+
+    // Struct variants are represented in JSON as `{ NAME: { K: V, ... } }` so
+    // deserialize the inner map here.
+    fn struct_variant<V>(self, _fields: &'static [&'static str], visitor: V) -> Result<V::Value>
+    where
+        V: de::Visitor<'de>,
+    {
+        de::Deserializer::deserialize_map(self.de, visitor)
     }
 }
