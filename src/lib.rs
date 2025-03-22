@@ -27,10 +27,15 @@ impl<'de> Deserializer<'de> {
         match self.input.find('\n') {
             Some(len) => {
                 let s = &self.input[..len];
-                self.input = &self.input[len + 1..];
+                self.input = &self.input[len..];
                 Ok(s)
             }
-            None => Ok(&self.input[..self.input.len()]),
+            None => {
+                let len = self.input.len();
+                let s = &self.input[..len];
+                self.input = &self.input[len..];
+                Ok(s)
+            }
         }
     }
 }
@@ -117,11 +122,12 @@ pub fn from_str<'a, T: de::Deserialize<'a>>(input: &'a str) -> error::Result<T> 
 // element.
 struct LineSeparated<'a, 'de: 'a> {
     de: &'a mut Deserializer<'de>,
+    first: bool,
 }
 
 impl<'a, 'de> LineSeparated<'a, 'de> {
     fn new(de: &'a mut Deserializer<'de>) -> Self {
-        LineSeparated { de }
+        LineSeparated { de, first: true }
     }
 }
 
@@ -142,9 +148,12 @@ impl<'de, 'a> SeqAccess<'de> for LineSeparated<'a, 'de> {
         }
 
         // Comma is required before every element except the first.
-        if self.de.next_char()? != '\n' {
+        if !self.first && self.de.next_char()? != '\n' {
             return Err(Error::Syntax);
         }
+
+        self.first = false;
+
         // Deserialize an array element.
         seed.deserialize(&mut *self.de).map(Some)
     }
