@@ -15,6 +15,6 @@ pub type Result<T> = std::result::Result<T, Error>;
 
 impl serde::de::Error for Error {
     fn custom<T: std::fmt::Display>(_msg: T) -> Self {
-        Error::InvalidLength
+        Error::Syntax
     }
 }

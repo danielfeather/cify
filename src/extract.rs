@@ -20,7 +20,7 @@ pub enum TransactionType {
 #[derive(Debug, Deserialize)]
 pub enum Record {
     /// Header
-    HD(String),
+    HD(Header),
     /// TIPLOC Insert
     TI(String),
     /// TIPLOC Amend

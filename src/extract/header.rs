@@ -1,11 +1,18 @@
-use std::fmt;
+use std::{fmt, str::FromStr};
 
 use serde::{
-    de::{self, value::StrDeserializer, SeqAccess, Visitor},
+    de::{self, value::StrDeserializer, IntoDeserializer, SeqAccess, Visitor},
     Deserialize, Deserializer, Serialize,
 };
+use thiserror::Error;
 
 use crate::error::{Error, Result};
+
+#[derive(Error, Debug)]
+enum ExtractTypeError {
+    #[error("Invalid character")]
+    InvalidCharacter,
+}
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum ExtractType {
@@ -22,8 +29,8 @@ pub struct Header {
     pub date_of_extract: String,
     pub time_of_extract: String,
     pub current_file_ref: String,
-    pub last_file_ref: String,
     pub extract_type: ExtractType,
+    pub last_file_ref: String,
     pub version: String,
     pub extract_start_date: String,
     pub extract_end_date: String,
@@ -34,46 +41,6 @@ impl<'de> Deserialize<'de> for Header {
     where
         D: Deserializer<'de>,
     {
-        enum Field {
-            Secs,
-            Nanos,
-        }
-
-        // This part could also be generated independently by:
-        //
-        //    #[derive(Deserialize)]
-        //    #[serde(field_identifier, rename_all = "lowercase")]
-        //    enum Field { Secs, Nanos }
-        impl<'de> Deserialize<'de> for Field {
-            fn deserialize<D>(deserializer: D) -> std::result::Result<Field, D::Error>
-            where
-                D: Deserializer<'de>,
-            {
-                struct FieldVisitor;
-
-                impl<'de> Visitor<'de> for FieldVisitor {
-                    type Value = Field;
-
-                    fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-                        formatter.write_str("`secs` or `nanos`")
-                    }
-
-                    fn visit_str<E>(self, value: &str) -> std::result::Result<Field, E>
-                    where
-                        E: de::Error,
-                    {
-                        match value {
-                            "secs" => Ok(Field::Secs),
-                            "nanos" => Ok(Field::Nanos),
-                            _ => Err(de::Error::unknown_field(value, FIELDS)),
-                        }
-                    }
-                }
-
-                deserializer.deserialize_identifier(FieldVisitor)
-            }
-        }
-
         struct HeaderVisitor;
 
         impl<'de> Visitor<'de> for HeaderVisitor {
@@ -83,32 +50,35 @@ impl<'de> Deserialize<'de> for Header {
                 formatter.write_str("struct Header")
             }
 
-            fn visit_seq<V>(self, mut seq: V) -> std::result::Result<Header, V::Error>
+            fn visit_borrowed_str<E>(self, v: &'de str) -> std::result::Result<Self::Value, E>
             where
-                V: SeqAccess<'de>,
+                E: de::Error,
             {
-                let secs = seq
-                    .next_element()?
-                    .ok_or_else(|| de::Error::invalid_length(0, &self))?;
-                let nanos = seq
-                    .next_element()?
-                    .ok_or_else(|| de::Error::invalid_length(1, &self))?;
+                let file_mainframe_identity = v[0..20].to_string();
+                let date_of_extract = v[20..26].to_string();
+                let time_of_extract = v[26..30].to_string();
+                let current_file_ref = v[30..37].to_string();
+                let last_file_ref = v[37..44].to_string();
+                let extract_type_field = &v[44..45];
+                let version = v[45..46].to_string();
+
+                let extract_start_date = v[46..52].to_string();
+                let extract_end_date = v[52..58].to_string();
 
                 Ok(Header {
-                    file_mainframe_identity: todo!(),
-                    date_of_extract: todo!(),
-                    time_of_extract: todo!(),
-                    current_file_ref: todo!(),
-                    last_file_ref: todo!(),
-                    extract_type: todo!(),
-                    version: todo!(),
-                    extract_start_date: todo!(),
-                    extract_end_date: todo!(),
+                    file_mainframe_identity,
+                    date_of_extract,
+                    time_of_extract,
+                    current_file_ref,
+                    last_file_ref,
+                    extract_type: ExtractType::deserialize(extract_type_field.into_deserializer())?,
+                    version,
+                    extract_start_date,
+                    extract_end_date,
                 })
             }
         }
 
-        const FIELDS: &[&str] = &["secs", "nanos"];
-        deserializer.deserialize_struct("Header", FIELDS, HeaderVisitor)
+        deserializer.deserialize_str(HeaderVisitor)
     }
 }
