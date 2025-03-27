@@ -89,8 +89,8 @@ impl<'de, 'a> de::Deserializer<'de> for &'a mut Deserializer<'de> {
 
     fn deserialize_enum<V>(
         self,
-        name: &'static str,
-        variants: &'static [&'static str],
+        _name: &'static str,
+        _variants: &'static [&'static str],
         visitor: V,
     ) -> std::result::Result<V::Value, Self::Error>
     where
@@ -196,7 +196,9 @@ impl<'de, 'a> de::VariantAccess<'de> for Enum<'a, 'de> {
     // If the `Visitor` expected this variant to be a unit variant, the input
     // should have been the plain string case handled in `deserialize_enum`.
     fn unit_variant(self) -> Result<()> {
-        Err(Error::InvalidLength)
+        let _ = self.de.parse_string()?;
+
+        Ok(())
     }
 
     // Newtype variants are represented in JSON as `{ NAME: VALUE }` so

@@ -3,6 +3,7 @@ pub mod identifier;
 pub mod location;
 pub mod tiploc;
 
+use header::Header;
 use serde::{self, Deserialize};
 
 #[derive(Debug, Deserialize)]
