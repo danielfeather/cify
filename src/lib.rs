@@ -149,7 +149,7 @@ impl<'de, 'a> SeqAccess<'de> for LineSeparated<'a, 'de> {
 
         // Comma is required before every element except the first.
         if !self.first && self.de.next_char()? != '\n' {
-            return Err(Error::Syntax);
+            return Err(Error::Syntax("Expected newline".to_string()));
         }
 
         self.first = false;

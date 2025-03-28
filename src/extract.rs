@@ -1,12 +1,14 @@
 pub mod header;
 pub mod identifier;
 pub mod location;
+pub mod schedule;
 pub mod tiploc;
 
 use header::Header;
+use schedule::BasicSchedule;
 use serde::{self, Deserialize};
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub enum TransactionType {
     #[serde(rename = "N")]
     New,
@@ -17,7 +19,7 @@ pub enum TransactionType {
 }
 
 /// Type representing the possible record types within a CIF extract
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub enum Record {
     /// Header
     HD(Header),
@@ -30,7 +32,7 @@ pub enum Record {
     /// Association
     AA,
     /// Basic Schedule
-    BS,
+    BS(BasicSchedule),
     /// Basic Schedule Extra Details
     BX,
     /// Train Specific Note (Unused)
