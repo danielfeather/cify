@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use chrono::NaiveDate;
+use chrono::{NaiveDate, Weekday};
 use serde::{
     de::{IntoDeserializer, Visitor},
     Deserialize,
@@ -28,7 +28,7 @@ pub struct BasicSchedule {
     pub train_uid: String,
     pub from: NaiveDate,
     pub to: NaiveDate,
-    // pub days: String,
+    pub days: Vec<Weekday>,
     // pub bank_holiday_running: bool,
     // pub train_status: String,
     // pub train_category: String,
@@ -85,12 +85,24 @@ impl FromStr for BasicSchedule {
                 RecordParsingError::InvalidField("Transaction Type", stripped[0..1].to_string())
             })?;
 
+        let days: Vec<Weekday> = stripped[19..26]
+            .chars()
+            .enumerate()
+            .filter_map(|(i, value)| {
+                if value == '0' {
+                    return None;
+                } else {
+                    return Weekday::try_from(i as u8).ok();
+                }
+            })
+            .collect();
+
         Ok(BasicSchedule {
             transaction_type,
             train_uid,
             from,
             to,
-            // days: todo!(),
+            days,
             // bank_holiday_running: todo!(),
             // train_status: todo!(),
             // train_category: todo!(),
