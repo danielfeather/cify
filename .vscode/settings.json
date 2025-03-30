@@ -1,4 +1,4 @@
 {
   "rust-analyzer.cargo.features": "all",
-  "cSpell.words": ["chrono", "Nalco", "tiploc"]
+  "cSpell.words": ["chrono", "Nalco", "Stanox", "thiserror", "tiploc"]
 }

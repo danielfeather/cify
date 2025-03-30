@@ -10,37 +10,51 @@ TIABDO   00909000ZABERDOUR                  03295   0AURABERDOUR
 TIABDVY  00443500EABERDOVEY                 64409   0AVYABERDOVEY               
 TIABER   08381300LABER                      78371   0ABEABER                    
 TIABGLELE00244800AABERGELE & PENSARN        40073   0AGLABERGELE & PENSN        
-BSNH472812503032503031000000            1                                      C
-BSNH472832503032505151111000 FB56L60    156161420 D  600 060Y                  P
-BX         ZZY                                                                  
-LOPBROLIP 1956 0000          TB                                                 
-LIPBRO              2002 000000001  SL                                          
-LIFLETTON           2005 00000000   FL                                          
-LICNNGSJN           2012H00000000   SL                                          
-LICNNGTNL 2015H2044H     00000000   FL    A                                     
-LIHNTNGDN           2053H000000002  SL FL                                       
-LISNDY              2108H000000001  SL                                          
-LIBIGLSWD           2111H000000001                                              
-LIHITCHIN           2121 000000001  SL                                          
-LISTEVNGE           2126 000000001                                              
-LIWLMRGRN           2130 00000000   FL                                          
-LIDIGSWEL           2132H00000000   SL                  1                       
-LIWLWYNGC           2135 000000002  SL                   H                      
-LIHATFILD           2138 000000001                    1 5                       
-LIPOTRSBR           2149 000000001                       H                      
-LINBARNET           2153 000000001                      4H                      
-LIALEXNDP           2203 000000001  SL2                 1                       
-LIHRGY              2206H00000000                       2                       
-LIFNPK    2210H2212H     000000001        C              H                      
-LIHLWYSJ  2215H2218      00000000   SL    A                                     
-LIKNGXFTJ           2222H00000000                        H                      
-LIYWAYNJN           2224 00000000                        H                      
-LICMDNRCJ 2227H2244      00000000         A                                     
-LICMDNRDJ           2246 00000000                       2                       
-LIGOSPLOK           2251 000000001                      1                       
-LIHMPSTDH           2254 000000001                      2                       
-LIWHMDSTD           2258H000000001                      3H                      
-LIKENSLGJ           2305 00000000                                               
-LIWLSDJHL           2306 000000005                      1                       
-LIACWLJN            2309 00000000                                               
-LTACTONTC 2314 0000      TF                                                     
+BSNP132082412152505110000001 PXX1S758044121730001 EMU397 125      B A F        P
+BX         TPY                                                                  
+LOMNCRIAP 1610 16104A        TB                                                 
+LIHLDGWJ            1612 00000000                                               
+LIHLDG              1613 000000001                      1                       
+LISLDLJN            1619H00000000   SL                                          
+LIARDWCKJ           1621H00000000                       1                       
+LIMNCRPIC 1624H1626H     1625162614    SL T                                     
+LIMNCROXR 1628 1630      162816302        T                                     
+LIMNCRDGT           1631 000000002                      1                       
+LIWATSTJN           1633 00000000                                               
+LIORDSLLJ           1633H00000000                       1                       
+LISLFDCT            1635H000000002                                              
+LIBDENJT            1641H00000000   DB                                          
+LIBOLTON  1642H1644      000016444        U                                     
+LILOSTCKJ           1647H00000000                                               
+LICHORLEY           1653 00000000                     2                         
+LIEUXTONJ           1657H00000000   FL                                          
+LIPRSTRJN           1701H00000000   DFL                                         
+LIPRST    1703 1705H     170317053  DFLDFLT                                     
+LIPRSTNFJ           1706H00000000                                               
+LIBBGHGL            1709H00000000                                               
+LIGSTANG            1712H00000000                                               
+LILANCSTR 1720 1721H     172017213        T                                     
+LIMORCMSJ           1723H00000000                                               
+LICRNFNJN           1726 00000000                                               
+LIOXENHLM 1734 1735H     173417352        T                                     
+LIGRIGG             1741H00000000                     1                         
+LITEBAY             1746H00000000                                               
+LISHAPSMT           1749H00000000                                               
+LISHAPHNS           1752 00000000                                               
+LIPNTH    1759H1801      180018012        T           2                         
+LICARLILE 1816 1818      181618183        T                                     
+LIGRETNAJ           1824H00000000                                               
+LIKRKP863           1827 00000000                                               
+LILCKRBIE 1835H1837      183618371        T                                     
+LIBEATCK            1846 00000000DM                                             
+LIBEATCKS           1852 00000000DM                                             
+LIABINGTN           1857H00000000DM                   2                         
+LICRSTRSS           1909 00000000                                               
+LICRSTRSE           1910 00000000                                               
+LIACHNGRY           1914 00000000                                               
+LICOBB713           1916 00000000                                               
+LIMDCLDRJ           1921 00000000                     1   1H                    
+LISLATEFD           1930 00000000                                               
+LIHAYMRKT 1932H1934      193300003  US    D              H                      
+LIPRNCSTG           1936H00000000   X                                           
+LTEDINBUR 1939 193912 X  TF                                                     

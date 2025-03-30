@@ -1,6 +1,6 @@
 use std::fs;
 
-use cify::extract::{header::Header, schedule::BasicSchedule, Record};
+use cify::extract::Record;
 
 #[test]
 fn deserialize_array() -> Result<(), Box<dyn std::error::Error>> {
@@ -9,7 +9,7 @@ fn deserialize_array() -> Result<(), Box<dyn std::error::Error>> {
     let result = cify::from_str::<Vec<Record>>(&raw)?;
 
     println!(
-        "{:?}",
+        "{:#?}",
         result // .iter()
                // .filter(|&record| matches!(record, Record::BS(_)))
                // .collect::<Vec<&Record>>()

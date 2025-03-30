@@ -2,6 +2,7 @@
 
 mod schedule;
 use error::{Error, Result};
+use serde;
 use serde::de::{self, DeserializeSeed, SeqAccess};
 
 pub mod error;

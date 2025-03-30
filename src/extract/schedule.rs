@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use std::{fmt::Display, str::FromStr};
 
 use chrono::{NaiveDate, Weekday};
 use serde::{
@@ -8,7 +8,7 @@ use serde::{
 
 use crate::error::RecordParsingError;
 
-use super::TransactionType;
+use super::{identifier::Atoc, TransactionType};
 
 #[derive(Debug, Deserialize, Clone)]
 pub enum StpIndicator {
@@ -154,4 +154,10 @@ impl<'de> Deserialize<'de> for BasicSchedule {
 
         deserializer.deserialize_str(BasicScheduleVisitor)
     }
+}
+
+struct BasicScheduleExtraDetails {
+    pub traction_class: String,
+    pub uic_code: Option<String>,
+    pub atoc_code: Atoc,
 }

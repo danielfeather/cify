@@ -7,6 +7,7 @@ pub mod tiploc;
 use header::Header;
 use schedule::BasicSchedule;
 use serde::{self, Deserialize};
+use tiploc::TiplocInsert;
 
 #[derive(Debug, Deserialize, Clone)]
 pub enum TransactionType {
@@ -24,7 +25,7 @@ pub enum Record {
     /// Header
     HD(Header),
     /// TIPLOC Insert
-    TI(String),
+    TI(TiplocInsert),
     /// TIPLOC Amend
     TA(String),
     /// TIPLOC Delete
