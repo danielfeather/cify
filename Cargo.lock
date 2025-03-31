@@ -59,15 +59,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "cify"
-version = "0.1.0"
-dependencies = [
- "chrono",
- "serde",
- "thiserror",
-]
-
-[[package]]
 name = "core-foundation-sys"
 version = "0.8.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -156,6 +147,15 @@ name = "rustversion"
 version = "1.0.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "eded382c5f5f786b989652c49544c4877d9f015cc22e145a5ea8ea66c2921cd2"
+
+[[package]]
+name = "schedule"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "serde",
+ "thiserror",
+]
 
 [[package]]
 name = "serde"
