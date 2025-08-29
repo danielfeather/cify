@@ -1,7 +1,11 @@
 use std::str::FromStr;
 
 use serde::{
-    de::{self, Visitor},
+    de::{
+        self,
+        value::{BorrowedStrDeserializer, StrDeserializer},
+        IntoDeserializer, Visitor,
+    },
     Deserialize,
 };
 
@@ -13,7 +17,7 @@ use super::{
 };
 
 #[derive(Debug, Clone)]
-/// TIPLOC Insert Record
+/// Timing Point Location (TIPLOC) Insert Record
 pub struct TiplocInsert {
     pub code: Tiploc,
     pub nalco: Nalco,
@@ -74,25 +78,18 @@ impl<'de> Deserialize<'de> for TiplocInsert {
     where
         D: serde::Deserializer<'de>,
     {
-        struct TiplocInsertVisitor;
-
-        impl<'de> Visitor<'de> for TiplocInsertVisitor {
-            type Value = TiplocInsert;
-
-            fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
-                formatter.write_str("struct TiplocInsert")
-            }
-
-            fn visit_borrowed_str<E>(self, v: &'de str) -> Result<Self::Value, E>
-            where
-                E: serde::de::Error,
-            {
-                v.parse::<Self::Value>().map_err(|e| de::Error::custom(e))
-            }
-        }
-
-        deserializer.deserialize_str(TiplocInsertVisitor)
+        Self::from_str(Deserialize::deserialize(deserializer)?).map_err(|e| de::Error::custom(e))
     }
+}
+
+#[test]
+fn deserialize_ti() -> Result<(), Box<dyn std::error::Error>> {
+    let raw = "TIAACHEN 00081601LAACHEN                    00005   0                           ";
+    let deserializer = BorrowedStrDeserializer::<de::value::Error>::new(raw);
+
+    let _ = TiplocInsert::deserialize(deserializer)?;
+
+    Ok(())
 }
 
 #[derive(Debug)]

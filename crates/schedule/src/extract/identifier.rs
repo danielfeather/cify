@@ -39,3 +39,6 @@ impl FromStr for Crs {
 
 #[derive(Debug, Clone)]
 pub struct Atoc(String);
+
+#[derive(Debug)]
+pub struct TrainUid(String);

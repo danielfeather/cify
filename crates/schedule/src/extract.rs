@@ -4,10 +4,13 @@ pub mod location;
 pub mod schedule;
 pub mod tiploc;
 
-use header::Header;
-use schedule::BasicSchedule;
+pub use header::*;
+pub use identifier::*;
+pub use location::*;
+pub use schedule::*;
+pub use tiploc::*;
+
 use serde::{self, Deserialize};
-use tiploc::TiplocInsert;
 
 #[derive(Debug, Deserialize, Clone)]
 pub enum TransactionType {
@@ -35,19 +38,19 @@ pub enum Record {
     /// Basic Schedule
     BS(BasicSchedule),
     /// Basic Schedule Extra Details
-    BX,
+    BX(String),
     /// Train Specific Note (Unused)
-    TN,
+    TN(String),
     /// Origin Location
-    LO,
+    LO(String),
     /// Intermediate Location
-    LI,
+    LI(String),
     /// Changes en Route
-    CR,
+    CR(String),
     /// Terminating Location
-    LT,
+    LT(String),
     /// Location Specific Note (Unused)
-    LN,
+    LN(String),
     /// Trailer
     ZZ,
 }

@@ -92,31 +92,15 @@ impl FromStr for Header {
     }
 }
 
-#[cfg(feature = "serde")]
 impl<'de> serde::Deserialize<'de> for Header {
     fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        use serde::de;
+        use serde::Deserialize;
 
-        struct HeaderVisitor;
+        let string = Deserialize::deserialize(deserializer)?;
 
-        impl<'de> de::Visitor<'de> for HeaderVisitor {
-            type Value = Header;
-
-            fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-                formatter.write_str("struct Header")
-            }
-
-            fn visit_borrowed_str<E>(self, v: &'de str) -> std::result::Result<Self::Value, E>
-            where
-                E: de::Error,
-            {
-                Header::from_str(v).map_err(|e| de::Error::custom(e))
-            }
-        }
-
-        deserializer.deserialize_str(HeaderVisitor)
+        Header::from_str(string).map_err(serde::de::Error::custom)
     }
 }

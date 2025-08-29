@@ -184,3 +184,12 @@ impl FromStr for PoMcpCode {
         Ok(PoMcpCode(s.to_string()))
     }
 }
+
+#[derive(Debug)]
+pub struct OriginLocation {}
+
+#[derive(Debug)]
+pub struct IntermediateLocation {}
+
+#[derive(Debug)]
+pub struct TerminatingLocation {}

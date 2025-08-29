@@ -1,6 +1,6 @@
 //! # Common Interface File
 
-mod schedule;
+mod timetable;
 use error::{Error, Result};
 use serde;
 use serde::de::{self, DeserializeSeed, SeqAccess};
@@ -148,7 +148,7 @@ impl<'de, 'a> SeqAccess<'de> for LineSeparated<'a, 'de> {
             return Ok(None);
         }
 
-        // Comma is required before every element except the first.
+        // Line ending is required before every element except the first.
         if !self.first && self.de.next_char()? != '\n' {
             return Err(Error::Syntax("Expected newline".to_string()));
         }

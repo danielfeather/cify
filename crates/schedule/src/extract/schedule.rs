@@ -135,28 +135,14 @@ impl<'de> Deserialize<'de> for BasicSchedule {
     where
         D: serde::Deserializer<'de>,
     {
-        struct BasicScheduleVisitor;
+        let string = Deserialize::deserialize(deserializer)?;
 
-        impl<'de> Visitor<'de> for BasicScheduleVisitor {
-            type Value = BasicSchedule;
-
-            fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
-                formatter.write_str("struct BasicSchedule")
-            }
-
-            fn visit_borrowed_str<E>(self, v: &'de str) -> Result<Self::Value, E>
-            where
-                E: serde::de::Error,
-            {
-                BasicSchedule::from_str(v).map_err(|e| E::custom(e))
-            }
-        }
-
-        deserializer.deserialize_str(BasicScheduleVisitor)
+        BasicSchedule::from_str(string).map_err(serde::de::Error::custom)
     }
 }
 
-struct BasicScheduleExtraDetails {
+#[derive(Debug)]
+pub struct BasicScheduleExtra {
     pub traction_class: String,
     pub uic_code: Option<String>,
     pub atoc_code: Atoc,

@@ -1,19 +1,23 @@
 use std::fs;
 
-use schedule::extract::Record;
+use cify::extract::{Header, Record};
 
 #[test]
 fn deserialize_array() -> Result<(), Box<dyn std::error::Error>> {
     let raw = fs::read_to_string("tests/extract.cif")?;
 
-    let result = schedule::from_str::<Vec<Record>>(&raw)?;
+    let result = cify::from_str::<Vec<Record>>(&raw)?;
 
-    println!(
-        "{:#?}",
-        result // .iter()
-               // .filter(|&record| matches!(record, Record::BS(_)))
-               // .collect::<Vec<&Record>>()
-    );
+    Ok(())
+}
+
+#[test]
+fn deserialize_string() -> Result<(), Box<dyn std::error::Error>> {
+    let result: Header = cify::from_str(
+        "TPS.UDFROC1.PD2502282802252154DFROC1B       FA280225280226                    ",
+    )?;
+
+    println!("{result:?}");
 
     Ok(())
 }

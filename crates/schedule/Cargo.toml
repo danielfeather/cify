@@ -1,10 +1,11 @@
 [package]
-name = "schedule"
+name = "cify"
 description = "A deserializer for the Common Interface File used for exchanging train schedule information in the UK"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+atomicow = "1.1.0"
 chrono = "0.4.40"
 serde = { version = "1", features = ["derive"], optional = true }
 thiserror = "2.0.12"
