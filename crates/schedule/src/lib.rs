@@ -155,8 +155,8 @@ impl<'de, 'a> SeqAccess<'de> for LineSeparated<'a, 'de> {
 
         self.first = false;
 
-        // Deserialize an array element.
-        seed.deserialize(&mut *self.de).map(Some)
+        // Needs revisiting
+        Ok(seed.deserialize(&mut *self.de).ok())
     }
 }
 

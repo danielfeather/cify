@@ -92,10 +92,10 @@ fn deserialize_ti() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-#[derive(Debug)]
+#[derive(Debug, Deserialize)]
 /// TIPLOC Amend Record
 pub struct TiplocAmend;
 
-#[derive(Debug)]
+#[derive(Debug, Deserialize)]
 /// TIPLOC Delete Record
 pub struct TiplocDelete;

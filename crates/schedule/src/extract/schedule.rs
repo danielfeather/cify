@@ -72,11 +72,11 @@ impl FromStr for BasicSchedule {
 
         let train_uid = stripped[1..7].to_string();
 
-        let from = NaiveDate::parse_from_str(&stripped[7..13], "%d%m%y").map_err(|_| {
+        let from = NaiveDate::parse_from_str(&stripped[7..13], "%y%m%d").map_err(|_| {
             RecordParsingError::InvalidField("Date Runs From", stripped[7..13].to_string())
         })?;
 
-        let to = NaiveDate::parse_from_str(&stripped[13..19], "%d%m%y").map_err(|_| {
+        let to = NaiveDate::parse_from_str(&stripped[13..19], "%y%m%d").map_err(|_| {
             RecordParsingError::InvalidField("Date Runs To", stripped[13..19].to_string())
         })?;
 
@@ -137,13 +137,26 @@ impl<'de> Deserialize<'de> for BasicSchedule {
     {
         let string = Deserialize::deserialize(deserializer)?;
 
-        BasicSchedule::from_str(string).map_err(serde::de::Error::custom)
+        BasicSchedule::from_str(string).map_err(|e| {
+            serde::de::Error::custom(match e {
+                RecordParsingError::InvalidLength => "invalid length",
+                RecordParsingError::InvalidField(_, _) => "invalid field",
+                RecordParsingError::NonAscii => "non ascii",
+                RecordParsingError::UnexpectedRecordIdentity(_) => "unexpected record type",
+            })
+        })
     }
 }
 
-#[derive(Debug)]
-pub struct BasicScheduleExtra {
-    pub traction_class: String,
-    pub uic_code: Option<String>,
-    pub atoc_code: Atoc,
+#[derive(Debug, Clone)]
+pub struct BasicScheduleExtra;
+
+impl<'de> Deserialize<'de> for BasicScheduleExtra {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let _string: &str = Deserialize::deserialize(deserializer)?;
+        Ok(Self)
+    }
 }

@@ -9,6 +9,8 @@ pub enum Error {
     Syntax(String),
     #[error("End of file")]
     Eof,
+    #[error("End of sequence")]
+    Eos,
 }
 
 #[derive(Debug, Error)]

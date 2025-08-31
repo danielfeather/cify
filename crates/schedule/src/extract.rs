@@ -1,9 +1,11 @@
+pub mod association;
 pub mod header;
 pub mod identifier;
 pub mod location;
 pub mod schedule;
 pub mod tiploc;
 
+pub use association::*;
 pub use header::*;
 pub use identifier::*;
 pub use location::*;
@@ -12,6 +14,13 @@ pub use tiploc::*;
 
 use serde::{self, Deserialize};
 
+/// Determines how the record should be interpreted in
+/// relation to another instance of the same record
+///
+/// For example, say that you are storing the records.
+/// If there was a previous record that created a `BS`
+/// record with [TransactionType::New] then a
+/// [TransactionType::Delete] would remove that schedule.
 #[derive(Debug, Deserialize, Clone)]
 pub enum TransactionType {
     #[serde(rename = "N")]

@@ -6,6 +6,8 @@ use serde::{
 };
 use thiserror::Error;
 
+use crate::error::RecordParsingError;
+
 /// National Location Code
 #[derive(Debug, Clone)]
 pub struct Nalco(String);
@@ -186,10 +188,87 @@ impl FromStr for PoMcpCode {
 }
 
 #[derive(Debug)]
-pub struct OriginLocation {}
+pub struct OriginLocation {
+    // location: Tiploc,
+    scheduled_departure_time: String,
+}
+
+impl FromStr for OriginLocation {
+    type Err = RecordParsingError;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        if !s.is_ascii() {
+            return Err(RecordParsingError::NonAscii);
+        }
+
+        let stripped = match s.len() {
+            78 => s,
+            80 => {
+                if &s[0..2] != "LO" {
+                    return Err(RecordParsingError::UnexpectedRecordIdentity("LO"));
+                }
+
+                &s[2..]
+            }
+            _ => return Err(RecordParsingError::InvalidLength),
+        };
+
+        Ok(Self {
+            // location: Tiploc::from_str(&stripped[0..8])
+            //     .map_err(|e| RecordParsingError::InvalidField("location", e.to_string()))?,
+            scheduled_departure_time: stripped[8..13].to_string(),
+        })
+    }
+}
+
+impl<'de> Deserialize<'de> for OriginLocation {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: de::Deserializer<'de>,
+    {
+        Self::from_str(Deserialize::deserialize(deserializer)?).map_err(de::Error::custom)
+    }
+}
 
 #[derive(Debug)]
-pub struct IntermediateLocation {}
+pub struct IntermediateLocation;
+
+impl FromStr for IntermediateLocation {
+    type Err = RecordParsingError;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let stripped = match s.len() {
+            78 => s,
+            80 => {
+                if &s[0..2] != "LI" {
+                    return Err(RecordParsingError::UnexpectedRecordIdentity("LI"));
+                }
+
+                &s[2..]
+            }
+            _ => return Err(RecordParsingError::InvalidLength),
+        };
+
+        Ok(IntermediateLocation)
+    }
+}
+
+impl<'de> Deserialize<'de> for IntermediateLocation {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: de::Deserializer<'de>,
+    {
+        Self::from_str(Deserialize::deserialize(deserializer)?).map_err(de::Error::custom)
+    }
+}
 
 #[derive(Debug)]
-pub struct TerminatingLocation {}
+pub struct TerminatingLocation;
+
+impl<'de> Deserialize<'de> for TerminatingLocation {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: de::Deserializer<'de>,
+    {
+        let _string: &str = Deserialize::deserialize(deserializer)?;
+        Ok(Self)
+    }
+}
