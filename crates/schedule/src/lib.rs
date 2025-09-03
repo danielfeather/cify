@@ -1,12 +1,12 @@
 //! # Common Interface File
 
-mod timetable;
 use error::{Error, Result};
 use serde;
 use serde::de::{self, DeserializeSeed, SeqAccess};
 
 pub mod error;
 pub mod extract;
+pub mod timetable;
 
 impl<'de> Deserializer<'de> {
     pub fn from_str(input: &'de str) -> Self {
@@ -141,6 +141,8 @@ impl<'de, 'a> SeqAccess<'de> for LineSeparated<'a, 'de> {
     where
         T: DeserializeSeed<'de>,
     {
+        let input = self.de.input;
+
         let peek_char = self.de.peek_char();
 
         // Check if there are no more elements.
@@ -156,7 +158,14 @@ impl<'de, 'a> SeqAccess<'de> for LineSeparated<'a, 'de> {
         self.first = false;
 
         // Needs revisiting
-        Ok(seed.deserialize(&mut *self.de).ok())
+
+        Ok(match seed.deserialize(&mut *self.de) {
+            Ok(value) => Some(value),
+            Err(_) => {
+                self.de.input = input;
+                None
+            }
+        })
     }
 }
 

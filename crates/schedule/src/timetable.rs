@@ -14,11 +14,11 @@ use crate::extract::{
 /// To be a valid table, the input must contain a minimum of a header and a trailer
 /// record type.
 pub struct Timetable {
-    header: Header,
-    tiploc_inserts: Vec<TiplocInsert>,
-    tiploc_amends: Vec<TiplocAmend>,
-    tiploc_deletes: Vec<TiplocDelete>,
-    train_schedules: Vec<TrainSchedule>,
+    pub header: Header,
+    pub tiploc_inserts: Vec<TiplocInsert>,
+    pub tiploc_amends: Vec<TiplocAmend>,
+    pub tiploc_deletes: Vec<TiplocDelete>,
+    pub train_schedules: Vec<TrainSchedule>,
 }
 
 impl<'de> Deserialize<'de> for Timetable {
@@ -43,29 +43,21 @@ impl<'de> Deserialize<'de> for Timetable {
                     .next_element()?
                     .ok_or_else(|| de::Error::invalid_length(0, &self))?;
 
-                let mut tiploc_inserts: Vec<TiplocInsert> = Vec::new();
+                let tiploc_inserts: Vec<TiplocInsert> = seq
+                    .next_element()?
+                    .ok_or_else(|| serde::de::Error::invalid_length(1, &self))?;
 
-                while let Some(ti) = seq.next_element()? {
-                    tiploc_inserts.push(ti);
-                }
+                let tiploc_amends: Vec<TiplocAmend> = seq
+                    .next_element()?
+                    .ok_or_else(|| serde::de::Error::invalid_length(2, &self))?;
 
-                let mut tiploc_amends: Vec<TiplocAmend> = Vec::new();
+                let tiploc_deletes: Vec<TiplocDelete> = seq
+                    .next_element()?
+                    .ok_or_else(|| serde::de::Error::invalid_length(3, &self))?;
 
-                while let Some(ta) = seq.next_element()? {
-                    tiploc_amends.push(ta);
-                }
-
-                let mut tiploc_deletes: Vec<TiplocDelete> = Vec::new();
-
-                while let Some(td) = seq.next_element()? {
-                    tiploc_deletes.push(td)
-                }
-
-                let mut train_schedules = Vec::new();
-
-                while let Some(ts) = seq.next_element()? {
-                    train_schedules.push(ts);
-                }
+                let train_schedules: Vec<TrainSchedule> = seq
+                    .next_element()?
+                    .ok_or_else(|| serde::de::Error::invalid_length(4, &self))?;
 
                 Ok(Timetable {
                     header,
@@ -87,7 +79,7 @@ pub struct TrainSchedule {
     bsx: BasicScheduleExtra,
     origin_location: OriginLocation,
     intermediate_locations: Vec<IntermediateLocation>,
-    // terminating_location: TerminatingLocation,
+    terminating_location: TerminatingLocation,
 }
 
 impl<'de> Deserialize<'de> for TrainSchedule {
@@ -120,22 +112,20 @@ impl<'de> Deserialize<'de> for TrainSchedule {
                     .next_element()?
                     .ok_or_else(|| de::Error::invalid_length(2, &self))?;
 
-                let mut intermediate_locations = Vec::new();
+                let intermediate_locations: Vec<IntermediateLocation> = seq
+                    .next_element()?
+                    .ok_or_else(|| de::Error::invalid_length(3, &self))?;
 
-                while let Some(ts) = seq.next_element()? {
-                    intermediate_locations.push(ts);
-                }
-
-                // let terminating_location = seq
-                //     .next_element()?
-                //     .ok_or_else(|| de::Error::invalid_length(3, &self))?;
+                let terminating_location = seq
+                    .next_element()?
+                    .ok_or_else(|| de::Error::invalid_length(4, &self))?;
 
                 Ok(TrainSchedule {
                     bs,
                     bsx,
                     origin_location,
                     intermediate_locations,
-                    // terminating_location,
+                    terminating_location,
                 })
             }
         }

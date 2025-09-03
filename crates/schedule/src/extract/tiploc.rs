@@ -40,7 +40,7 @@ impl FromStr for TiplocInsert {
             78 => s,
             80 => {
                 if &s[0..2] != "TI" {
-                    return Err(RecordParsingError::UnexpectedRecordIdentity("BS"));
+                    return Err(RecordParsingError::UnexpectedRecordIdentity("TI"));
                 }
 
                 &s[2..]
@@ -92,10 +92,74 @@ fn deserialize_ti() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug)]
 /// TIPLOC Amend Record
 pub struct TiplocAmend;
 
-#[derive(Debug, Deserialize)]
+impl FromStr for TiplocAmend {
+    type Err = RecordParsingError;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        if !s.is_ascii() {
+            return Err(RecordParsingError::NonAscii);
+        }
+
+        let stripped = match s.len() {
+            78 => s,
+            80 => {
+                if &s[0..2] != "TA" {
+                    return Err(RecordParsingError::UnexpectedRecordIdentity("TA"));
+                }
+
+                &s[2..]
+            }
+            _ => return Err(RecordParsingError::InvalidLength),
+        };
+
+        Ok(Self)
+    }
+}
+
+impl<'de> Deserialize<'de> for TiplocAmend {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: de::Deserializer<'de>,
+    {
+        Self::from_str(Deserialize::deserialize(deserializer)?).map_err(|e| de::Error::custom(e))
+    }
+}
+
+#[derive(Debug)]
 /// TIPLOC Delete Record
 pub struct TiplocDelete;
+
+impl FromStr for TiplocDelete {
+    type Err = RecordParsingError;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        if !s.is_ascii() {
+            return Err(RecordParsingError::NonAscii);
+        }
+
+        let stripped = match s.len() {
+            78 => s,
+            80 => {
+                if &s[0..2] != "TD" {
+                    return Err(RecordParsingError::UnexpectedRecordIdentity("TD"));
+                }
+
+                &s[2..]
+            }
+            _ => return Err(RecordParsingError::InvalidLength),
+        };
+
+        Ok(Self)
+    }
+}
+
+impl<'de> Deserialize<'de> for TiplocDelete {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: de::Deserializer<'de>,
+    {
+        Self::from_str(Deserialize::deserialize(deserializer)?).map_err(|e| de::Error::custom(e))
+    }
+}

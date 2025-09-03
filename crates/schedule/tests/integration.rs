@@ -1,12 +1,24 @@
 use std::fs;
 
-use cify::extract::{Header, Record};
+use cify::{
+    extract::{Header, Record},
+    timetable::Timetable,
+};
 
 #[test]
 fn deserialize_array() -> Result<(), Box<dyn std::error::Error>> {
     let raw = fs::read_to_string("tests/extract.cif")?;
 
     let result = cify::from_str::<Vec<Record>>(&raw)?;
+
+    Ok(())
+}
+
+#[test]
+fn deserialize_extract() -> Result<(), Box<dyn std::error::Error>> {
+    let raw = fs::read_to_string("tests/extract.cif")?;
+
+    let result = cify::from_str::<Timetable>(&raw)?;
 
     Ok(())
 }
