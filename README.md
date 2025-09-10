@@ -1,4 +1,6 @@
 # Cify
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fdanielfeather%2Fcify.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fdanielfeather%2Fcify?ref=badge_shield)
+
 
 A creatively named Rust crate (I know right), implementing data types found in the [Common Interface File (CIF) format](https://wiki.openraildata.com/index.php/CIF_File_Format) used to exchange train schedule information between different systems in the UK.
 
@@ -15,3 +17,7 @@ Resources:
 https://wiki.openraildata.com
 
 https://www.networkrail.co.uk/who-we-are/transparency-and-ethics/transparency/open-data-feeds/
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fdanielfeather%2Fcify.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fdanielfeather%2Fcify?ref=badge_large)
