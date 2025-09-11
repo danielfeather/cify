@@ -15,4 +15,4 @@ jobs:
         run: echo "SCHEDULE_DAY=$(date -d yesterday +%a | awk '{print tolower($0)}')" >> "$GITHUB_OUTPUT"
 
       - name: Download Update Schedule
-        run:  curl -L -u '$NETWORK_RAIL_USERNAME:$NETWORK_RAIL_PASSWORD' -o file.gz 'https://publicdatafeeds.networkrail.co.uk/ntrod/CifFileAuthenticate?type=CIF_ALL_UPDATE_DAILY&day=toc-update-${{ steps.day-of-week.outputs.day }}.CIF.gz'
+        run:  curl -L -u "$NETWORK_RAIL_USERNAME:$NETWORK_RAIL_PASSWORD" -o file.gz 'https://publicdatafeeds.networkrail.co.uk/ntrod/CifFileAuthenticate?type=CIF_ALL_UPDATE_DAILY&day=toc-update-${{ steps.day-of-week.outputs.day }}.CIF.gz'
