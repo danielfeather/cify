@@ -2,17 +2,43 @@ name: "Fetch latest schedules"
 
 on:
   schedule:
-    - cron: "* 5 * * *"
+    - cron: "0 5 * * *"
   workflow_dispatch:
+
+env:
+  BUCKET_NAME: "cify-extracts"
+  AWS_REGION: "eu-west-2"
+permissions:
+  id-token: write
 
 jobs:
   get-update-schedule:
-    name: "Get the latest update schedule"
+    name: "Get the latest schedules"
     runs-on: ubuntu-latest
     steps:
-      - name: Retrieve yesterdays day of the week
-        id: day-of-week
-        run: echo "DAY=$(date -d yesterday +%a | awk '{print tolower($0)}')" >> "$GITHUB_OUTPUT"
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@main
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/CifySchedulePuller
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Retrieve day of latest published schedule(s)
+        id: date
+        run: |
+          echo "DAY=$(date -d yesterday +%a | awk '{print tolower($0)}')" >> $GITHUB_OUTPUT
+          echo "DATE=$(date -d yesterday +%y%m%d)" >> $GITHUB_OUTPUT
 
       - name: Download Update Schedule
-        run: curl -L -u "${{ secrets.NETWORK_RAIL_USERNAME }}:${{ secrets.NETWORK_RAIL_PASSWORD }}" -o file.gz 'https://publicdatafeeds.networkrail.co.uk/ntrod/CifFileAuthenticate?type=CIF_ALL_UPDATE_DAILY&day=toc-update-${{ steps.day-of-week.outputs.DAY }}.CIF.gz'
+        env:
+          UPDATE_FILENAME: ${{ steps.date.outputs.DATE }}-update.cif.gz
+        run: |
+          curl -L -u "${{ secrets.NETWORK_RAIL_USERNAME }}:${{ secrets.NETWORK_RAIL_PASSWORD }}" -o $UPDATE_FILENAME 'https://publicdatafeeds.networkrail.co.uk/ntrod/CifFileAuthenticate?type=CIF_ALL_UPDATE_DAILY&day=toc-update-${{ steps.date.outputs.DAY }}.CIF.gz'
+          aws s3 cp "./$UPDATE_FILENAME" s3://${{ env.BUCKET_NAME }}
+
+      - name: Download Full Schedule
+        if: ${{ steps.date.outputs.DAY == 'fri' }}
+        env:
+          FULL_FILENAME: ${{ steps.date.outputs.DATE }}-full.cif.gz
+        run: |
+          curl -L -u "${{ secrets.NETWORK_RAIL_USERNAME }}:${{ secrets.NETWORK_RAIL_PASSWORD }}" -o $FULL_FILENAME 'https://publicdatafeeds.networkrail.co.uk/ntrod/CifFileAuthenticate?type=CIF_ALL_FULL_DAILY&day=toc-full.CIF.gz'
+          aws s3 cp "./$FULL_FILENAME" s3://${{ env.BUCKET_NAME }}
