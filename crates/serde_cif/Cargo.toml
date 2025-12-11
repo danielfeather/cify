@@ -1,0 +1,11 @@
+[package]
+name = "serde_cif"
+description = "A deserializer for the Common Interface File (CIF) format used for exchanging train schedule information in the UK"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+serde = "1"
+thiserror = "2.0.12"
+
+[dev-dependencies]

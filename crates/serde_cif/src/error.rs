@@ -1,7 +1,6 @@
-use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-#[derive(Serialize, Deserialize, Debug, Error)]
+#[derive(Debug, Error)]
 pub enum Error {
     #[error("Invalid length")]
     InvalidLength,
@@ -9,8 +8,6 @@ pub enum Error {
     Syntax(String),
     #[error("End of file")]
     Eof,
-    #[error("End of sequence")]
-    Eos,
 }
 
 #[derive(Debug, Error)]
