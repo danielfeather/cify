@@ -33,8 +33,6 @@ jobs:
           UPDATE_FILENAME: ${{ steps.date.outputs.DATE }}-update.cif.gz
         run: |
           curl -L -u "${{ secrets.NETWORK_RAIL_USERNAME }}:${{ secrets.NETWORK_RAIL_PASSWORD }}" -o $UPDATE_FILENAME 'https://publicdatafeeds.networkrail.co.uk/ntrod/CifFileAuthenticate?type=CIF_ALL_UPDATE_DAILY&day=toc-update-${{ steps.date.outputs.DAY }}.CIF.gz'
-          header="$(head -n 1 $UPDATE_FILENAME)"
-          echo "${header}:22:6"
           aws s3 cp "./$UPDATE_FILENAME" s3://${{ env.BUCKET_NAME }}
 
       - name: Download Full Schedule
